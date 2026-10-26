@@ -441,29 +441,41 @@
     });
 
     async function fetchData() {
-      updateSyncStatus("Sincronizando...", "#155C8C");
-      try {
-        const res = await fetch(APPS_SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify({ action: "getData" })
-        });
-        const json = await res.json();
-        if (json.success) {
-          appState.proyectos = json.data.proyectos || [];
-          appState.noticias = json.data.noticias || [];
-          appState.lastUpdate = new Date();
-          document.getElementById("last-update").innerText = appState.lastUpdate.toLocaleTimeString();
-          updateSyncStatus("Conectado", "var(--exito)");
-          renderCurrentView();
-        } else {
-          showNotification("Error al cargar datos: " + json.error, "danger");
-          updateSyncStatus("Error de conexión", "var(--error)");
-        }
-      } catch (err) {
-        showNotification("No se pudo conectar con el servidor Apps Script.", "danger");
-        updateSyncStatus("Desconectado", "var(--error)");
-      }
+  updateSyncStatus("Sincronizando...", "#155C8C");
+  try {
+    const res = await fetch(APPS_SCRIPT_URL, {
+      method: "POST",
+      body: JSON.stringify({ action: "getData" })
+    });
+    
+    const textResponse = await res.text();
+    let json;
+    try {
+      json = JSON.parse(textResponse);
+    } catch (e) {
+      console.error("Respuesta cruda de Apps Script:", textResponse);
+      showNotification("Error: El servidor no devolvió un JSON válido. Revisa la consola.", "danger");
+      updateSyncStatus("Error de formato", "var(--error)");
+      return;
     }
+
+    if (json.success) {
+      appState.proyectos = json.data.proyectos || [];
+      appState.noticias = json.data.noticias || [];
+      appState.lastUpdate = new Date();
+      document.getElementById("last-update").innerText = appState.lastUpdate.toLocaleTimeString();
+      updateSyncStatus("Conectado", "var(--exito)");
+      renderCurrentView();
+    } else {
+      showNotification("Error del servidor: " + json.error, "danger");
+      updateSyncStatus("Error de servidor", "var(--error)");
+    }
+  } catch (err) {
+    console.error(err);
+    showNotification("No se pudo conectar con Apps Script. Verifica la URL y los permisos.", "danger");
+    updateSyncStatus("Desconectado", "var(--error)");
+  }
+}
 
     async function apiPost(action, payload) {
       updateSyncStatus("Guardando...", "#155C8C");
