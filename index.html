@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CLIPPING | MPBA - Monitoreo de Prensa</title>
+  <!-- Favicon obligatorio según guía MPBA -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔷</text></svg>">
+  
+  <style>
+    /* Estilos basados en la Guía de Estilo Web Interna - MPBA */
+    :root {
+      --azul-principal: #193B57;
+      --texto-principal: #243645;
+      --texto-secundario: #647687;
+      --fondo-pagina: #F5F7F9;
+      --bordes: #DCE4EB;
+      --enlace: #155C8C;
+      --exito: #1C8053;
+      --error: #A03434;
+      --blanco: #FFFFFF;
+      --font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--fondo-pagina);
+      color: var(--texto-principal);
+      font-size: 14px;
+      line-height: 1.5;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    /* Layout principal */
+    .container {
+      max-width: 1120px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    header {
+      background-color: var(--azul-principal);
+      color: var(--blanco);
+      padding: 12px 0;
+      border-bottom: 3px solid #0F2537;
+    }
+    header .header-inner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    header .sub-brand { font-size: 12px; color: #BDC8D2; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    main { flex: 1; padding: 24px 0; }
+
+    /* Componentes MPBA */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: background-color 0.2s, border-color 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary { background-color: var(--azul-principal); color: var(--blanco); }
+    .btn-primary:hover { background-color: #122C42; }
+    .btn-secondary { background-color: var(--blanco); color: var(--azul-principal); border-color: #CAD5DE; }
+    .btn-secondary:hover { background-color: #EBF0F4; }
+    .btn-danger { background-color: var(--error); color: var(--blanco); }
+    .btn-danger:hover { background-color: #822929; }
+    .btn-sm { padding: 4px 10px; font-size: 12px; border-radius: 6px; }
+
+    .card {
+      background: var(--blanco);
+      border: 1px solid var(--bordes);
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+    }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: 4px; font-size: 13px; }
+    .form-control {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #CAD5DE;
+      border-radius: 8px;
+      font-size: 14px;
+      color: var(--texto-principal);
+      background-color: var(--blanco);
+    }
+    .form-control:focus { outline: none; border-color: var(--azul-principal); }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .form-group { flex: 1; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      background: #EAEFF4;
+      color: var(--texto-principal);
+    }
+    .badge-activa { background: #E2F3EB; color: var(--exito); }
+    .badge-cerrada { background: #FDE8E8; color: var(--error); }
+
+    /* Modales */
+    .modal-backdrop {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 1000;
+    }
+    .modal {
+      background: var(--blanco);
+      border-radius: 12px;
+      width: 100%; max-width: 580px;
+      padding: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--bordes); padding-bottom: 12px; }
+    .modal-title { font-size: 18px; font-weight: 600; color: var(--azul-principal); }
+
+    /* Alertas */
+    .alert {
+      padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 8px;
+    }
+    .alert-success { background: #E2F3EB; color: var(--exito); border: 1px solid #BCE3D1; }
+    .alert-danger { background: #FDE8E8; color: var(--error); border: 1px solid #F5C2C2; }
+    .alert-warning { background: #FFF8E6; color: #8A6D3B; border: 1px solid #FAEBCC; }
+
+    /* Tablero Dashboards */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .kpi-card { background: var(--blanco); border: 1px solid var(--bordes); border-radius: 10px; padding: 14px; text-align: center; }
+    .kpi-value { font-size: 24px; font-weight: 700; color: var(--azul-principal); }
+    .kpi-label { font-size: 12px; color: var(--texto-secundario); margin-top: 2px; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 768px) { .grid-2, .form-row { flex-direction: column; grid-template-columns: 1fr; } }
+
+    /* Barra de estado y guardado */
+    .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #EAEFF4; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: var(--texto-secundario); }
+
+    /* Modo Presentación */
+    body.presentation-mode header, body.presentation-mode .no-print, body.presentation-mode footer { display: none !important; }
+    body.presentation-mode { background: #0F172A; color: #F8FAFC; }
+    body.presentation-mode .card { background: #1E293B; border-color: #334155; color: #F8FAFC; }
+    body.presentation-mode .kpi-card { background: #1E293B; border-color: #334155; }
+    body.presentation-mode .kpi-value { color: #38BDF8; }
+    body.presentation-mode .kpi-label { color: #94A3B8; }
+    body.presentation-mode h2, body.presentation-mode h3, body.presentation-mode h4 { color: #F8FAFC !important; }
+    body.presentation-mode a { color: #38BDF8; }
+
+    /* Vista de impresión */
+    @media print {
+      .no-print { display: none !important; }
+      body { background: white; color: black; }
+      .card { border: none; border-bottom: 1px solid #ccc; border-radius: 0; }
+    }
+
+    footer { background: var(--blanco); border-top: 1px solid var(--bordes); padding: 16px 0; text-align: center; font-size: 12px; color: var(--texto-secundario); margin-top: auto; }
+  </style>
+</head>
+<body>
+
+  <header class="no-print">
+    <div class="container header-inner">
+      <h1>🔷 CLIPPING <span class="sub-brand">| MPBA</span></h1>
+      <div style="font-size: 12px; opacity: 0.9;">Comunicación Digital y Redes Sociales</div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Barra de Estado / Sync -->
+    <div class="status-bar no-print">
+      <div>Estado: <strong id="sync-status" style="color: var(--exito);">Conectado</strong></div>
+      <div>Última actualización: <span id="last-update">Sincronizando...</span></div>
+    </div>
+
+    <!-- Mensajes de Notificación -->
+    <div id="alert-container" class="no-print"></div>
+
+    <!-- VISTA 1: PROYECTOS (INICIO) -->
+    <section id="view-projects">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 20px; color: var(--azul-principal);">Proyectos de Monitoreo</h2>
+          <p style="color: var(--texto-secundario); font-size: 13px;">Seleccione un proyecto para ver la cobertura o cree uno nuevo.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openProjectModal()">+ Nuevo Proyecto</button>
+      </div>
+
+      <div id="projects-list" class="grid-2">
+        <!-- Render dinámico de proyectos -->
+      </div>
+    </section>
+
+    <!-- VISTA 2: TABLERO DE PROYECTO (DETALLE) -->
+    <section id="view-dashboard" style="display: none;">
+      <!-- Cabecera de Proyecto -->
+      <div class="card no-print">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <button class="btn btn-secondary btn-sm" onclick="showView('projects')" style="margin-bottom: 8px;">← Volver a Proyectos</button>
+            <h2 id="dash-title" style="font-size: 22px; color: var(--azul-principal);"></h2>
+            <p id="dash-desc" style="color: var(--texto-secundario); margin-top: 4px;"></p>
+            <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--texto-secundario);">
+              <span>Período: <strong id="dash-periodo"></strong></span> |
+              <span>Tema: <strong id="dash-tema"></strong></span> |
+              <span>Estado: <span id="dash-estado" class="badge"></span></span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+            <button class="btn btn-secondary btn-sm" onclick="editCurrentProject()">✏️ Editar Proyecto</button>
+            <button class="btn btn-primary btn-sm" onclick="openNewsModal()">+ Agregar Noticia</button>
+            <button class="btn btn-secondary btn-sm" onclick="enterPresentationMode()">📺 Modo Presentación</button>
+            <button class="btn btn-secondary btn-sm" onclick="exportCSV()">📥 Exportar CSV</button>
+            <button class="btn btn-secondary btn-sm" onclick="window.print()">🖨️ Imprimir</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Encabezado exclusivo de Presentación -->
+      <div id="presentation-header" style="display: none; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 id="pres-title" style="font-size: 26px;"></h2>
+            <p id="pres-desc" style="color: #94A3B8;"></p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="exitPresentationMode()">❌ Salir de Presentación (Esc)</button>
+        </div>
+      </div>
+
+      <!-- KPIs / Indicadores Reales -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpi-total">0</div>
+          <div class="kpi-label">Noticias Registradas</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpi-medios">0</div>
+          <div class="kpi-label">Medios Únicos</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpi-digital">0</div>
+          <div class="kpi-label">Medios Digitales</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="kpi-provincial">0</div>
+          <div class="kpi-label">Alcance Provincial</div>
+        </div>
+      </div>
+
+      <!-- Filtros y Búsqueda -->
+      <div class="card no-print" style="padding: 12px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
+          <input type="text" id="filter-search" class="form-control" style="flex: 2; min-width: 200px;" placeholder="Buscar titular, medio, resumen o etiqueta..." oninput="renderDashboard()">
+          <select id="filter-tipo" class="form-control" style="flex: 1; min-width: 140px;" onchange="renderDashboard()">
+            <option value="">Todos los Tipos</option>
+            <option value="Digital">Digital</option>
+            <option value="Gráfico">Gráfico</option>
+            <option value="Televisión">Televisión</option>
+            <option value="Radio">Radio</option>
+            <option value="Otro">Otro</option>
+          </select>
+          <select id="filter-alcance" class="form-control" style="flex: 1; min-width: 140px;" onchange="renderDashboard()">
+            <option value="">Todos los Alcances</option>
+            <option value="Local">Local</option>
+            <option value="Provincial">Provincial</option>
+            <option value="Nacional">Nacional</option>
+            <option value="Internacional">Internacional</option>
+          </select>
+          <select id="sort-order" class="form-control" style="flex: 1; min-width: 140px;" onchange="renderDashboard()">
+            <option value="desc">Más recientes primero</option>
+            <option value="asc">Más antiguas primero</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Distribución Visual de Medios y Tipos -->
+      <div class="grid-2" style="margin-bottom: 20px;">
+        <div class="card">
+          <h4 style="font-size: 14px; color: var(--azul-principal); margin-bottom: 10px;">Distribución por Tipo de Medio</h4>
+          <div id="dist-tipo-container"></div>
+        </div>
+        <div class="card">
+          <h4 style="font-size: 14px; color: var(--azul-principal); margin-bottom: 10px;">Principales Medios</h4>
+          <div id="dist-medio-container"></div>
+        </div>
+      </div>
+
+      <!-- Listado de Noticias (Cronología) -->
+      <h3 style="font-size: 16px; color: var(--azul-principal); margin-bottom: 12px;">Cronología de Cobertura</h3>
+      <div id="news-list">
+        <!-- Render dinámico de noticias -->
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: CREAR / EDITAR PROYECTO -->
+  <div id="modal-project" class="modal-backdrop" style="display: none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-project-title">Nuevo Proyecto</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-project')">✕</button>
+      </div>
+      <form id="form-project" onsubmit="handleSaveProject(event)">
+        <input type="hidden" id="proj-id">
+        <div class="form-group">
+          <label for="proj-nombre">Nombre del Proyecto *</label>
+          <input type="text" id="proj-nombre" class="form-control" required placeholder="Ej: CyberMonday 2026 - Prevención de Ciberdelitos">
+        </div>
+        <div class="form-group">
+          <label for="proj-descripcion">Descripción / Objetivos</label>
+          <textarea id="proj-descripcion" class="form-control" rows="2" placeholder="Resumen institucional de la campaña de prensa..."></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="proj-tema">Tema Principal</label>
+            <input type="text" id="proj-tema" class="form-control" placeholder="Ej: Ciberseguridad">
+          </div>
+          <div class="form-group">
+            <label for="proj-estado">Estado *</label>
+            <select id="proj-estado" class="form-control" required>
+              <option value="Activo">Activo</option>
+              <option value="Cerrado">Cerrado</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="proj-fechaInicio">Fecha Inicio</label>
+            <input type="date" id="proj-fechaInicio" class="form-control">
+          </div>
+          <div class="form-group">
+            <label for="proj-fechaCierre">Fecha Cierre</label>
+            <input type="date" id="proj-fechaCierre" class="form-control">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="proj-responsable">Responsable / Área (Opcional)</label>
+          <input type="text" id="proj-responsable" class="form-control" placeholder="Ej: Prensa / Equipo Digital">
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-project')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Proyecto</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CREAR / EDITAR NOTICIA -->
+  <div id="modal-news" class="modal-backdrop" style="display: none;">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-news-title">Cargar Noticia</h3>
+        <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-news')">✕</button>
+      </div>
+      <form id="form-news" onsubmit="handleSaveNews(event)">
+        <input type="hidden" id="news-id">
+        <input type="hidden" id="news-proyectoId">
+        
+        <div class="form-group">
+          <label for="news-url">URL de la Noticia *</label>
+          <input type="url" id="news-url" class="form-control" required placeholder="https://..." onblur="checkDuplicateUrl(this.value)">
+          <div id="duplicate-warning" style="display:none; color: var(--error); font-size: 12px; margin-top: 4px;">⚠️ Advertencia: Esta URL ya ha sido cargada previamente en este proyecto.</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="news-titular">Titular de la Noticia *</label>
+          <input type="text" id="news-titular" class="form-control" required placeholder="Escriba el título exacto de la nota">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="news-medio">Medio de Comunicación *</label>
+            <input type="text" id="news-medio" class="form-control" required placeholder="Ej: El Día, Télam, Clarín">
+          </div>
+          <div class="form-group">
+            <label for="news-fechaPublicacion">Fecha de Publicación *</label>
+            <input type="date" id="news-fechaPublicacion" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="news-tipoMedio">Tipo de Medio *</label>
+            <select id="news-tipoMedio" class="form-control" required>
+              <option value="Digital">Digital</option>
+              <option value="Gráfico">Gráfico</option>
+              <option value="Televisión">Televisión</option>
+              <option value="Radio">Radio</option>
+              <option value="Otro">Otro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="news-alcance">Alcance *</label>
+            <select id="news-alcance" class="form-control" required>
+              <option value="Provincial">Provincial</option>
+              <option value="Local">Local</option>
+              <option value="Nacional">Nacional</option>
+              <option value="Internacional">Internacional</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="news-resumen">Resumen Breve</label>
+          <textarea id="news-resumen" class="form-control" rows="2" placeholder="Síntesis del contenido periodístico..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="news-etiquetas">Etiquetas (separadas por coma)</label>
+          <input type="text" id="news-etiquetas" class="form-control" placeholder="Ej: Fiscalías, Phishing, Prevención">
+        </div>
+
+        <div class="form-group">
+          <label for="news-observaciones">Observaciones Internas</label>
+          <input type="text" id="news-observaciones" class="form-control" placeholder="Ej: Repercusión positiva, cita al Procurador General">
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-news')">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Guardar Noticia</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="no-print">
+    <div class="container">
+      Ministerio Público de la Provincia de Buenos Aires &bull; Área de Comunicación Digital y Redes Sociales
+    </div>
+  </footer>
+
+  <script>
+    // Configuración del endpoint de Apps Script
+    // REEMPLAZAR CON TU URL DE DESPLEGUE DE GOOGLE APPS SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxN5B9Ee6tgsFpnZeA-qsG2sk-DjgEzfusAHh1GrWSD2Brt26B6gQcBHtLTICZ54NjX/exec";
+
+    // Estado global de la aplicación
+    let appState = {
+      proyectos: [],
+      noticias: [],
+      currentProjectId: null,
+      lastUpdate: null
+    };
+
+    // Inicialización
+    document.addEventListener("DOMContentLoaded", () => {
+      fetchData();
+      
+      // Control de atajo de teclado para salir de Presentación
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
+          exitPresentationMode();
+        }
+      });
+    });
+
+    // Comunicación con el Backend
+    async function fetchData() {
+      updateSyncStatus("Sincronizando...", "#155C8C");
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action: "getData" })
+        });
+        const json = await res.json();
+        if (json.success) {
+          appState.proyectos = json.data.proyectos || [];
+          appState.noticias = json.data.noticias || [];
+          appState.lastUpdate = new Date();
+          document.getElementById("last-update").innerText = appState.lastUpdate.toLocaleTimeString();
+          updateSyncStatus("Conectado", "var(--exito)");
+          renderCurrentView();
+        } else {
+          showNotification("Error al cargar datos del servidor: " + json.error, "danger");
+          updateSyncStatus("Error de conexión", "var(--error)");
+        }
+      } catch (err) {
+        showNotification("No se pudo conectar con el servidor. Verifique la URL de Apps Script.", "danger");
+        updateSyncStatus("Desconectado", "var(--error)");
+      }
+    }
+
+    async function apiPost(action, payload) {
+      updateSyncStatus("Guardando...", "#155C8C");
+      try {
+        const res = await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          body: JSON.stringify({ action, payload })
+        });
+        const json = await res.json();
+        if (json.success) {
+          updateSyncStatus("Guardado", "var(--exito)");
+          await fetchData();
+          return json.data;
+        } else {
+          showNotification("Error en la operación: " + json.error, "danger");
+          updateSyncStatus("Error", "var(--error)");
+          return null;
+        }
+      } catch (err) {
+        showNotification("Error de red al guardar los cambios.", "danger");
+        updateSyncStatus("Error de red", "var(--error)");
+        return null;
+      }
+    }
+
+    function updateSyncStatus(text, color) {
+      const el = document.getElementById("sync-status");
+      el.innerText = text;
+      el.style.color = color;
+    }
+
+    // Renderizado de Vistas
+    function renderCurrentView() {
+      if (appState.currentProjectId) {
+        renderDashboard();
+      } else {
+        renderProjectsList();
+      }
+    }
+
+    function showView(view) {
+      if (view === 'projects') {
+        appState.currentProjectId = null;
+        document.getElementById("view-projects").style.display = "block";
+        document.getElementById("view-dashboard").style.display = "none";
+        renderProjectsList();
+      } else if (view === 'dashboard') {
+        document.getElementById("view-projects").style.display = "none";
+        document.getElementById("view-dashboard").style.display = "block";
+        renderDashboard();
+      }
+    }
+
+    // VISTA PROYECTOS
+    function renderProjectsList() {
+      const container = document.getElementById("projects-list");
+      container.innerHTML = "";
+
+      if (appState.proyectos.length === 0) {
+        container.innerHTML = `
+          <div class="card" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+            <p style="color: var(--texto-secundario); font-size: 15px;">No hay proyectos de monitoreo creados aún.</p>
+            <button class="btn btn-primary" onclick="openProjectModal()" style="margin-top: 12px;">Crear Primer Proyecto</button>
+          </div>
+        `;
+        return;
+      }
+
+      appState.proyectos.forEach(p => {
+        const newsCount = appState.noticias.filter(n => n.proyectoId === p.id).length;
+        const lastMod = p.ultimaModificacion ? new Date(p.ultimaModificacion).toLocaleDateString() : 'N/A';
+        const isActivo = p.estado === 'Activo';
+
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+            <h3 style="font-size: 16px; color: var(--azul-principal); cursor: pointer;" onclick="openDashboard('${p.id}')">${escapeHtml(p.nombre)}</h3>
+            <span class="badge ${isActivo ? 'badge-activa' : 'badge-cerrada'}">${p.estado}</span>
+          </div>
+          <p style="color: var(--texto-secundario); font-size: 13px; margin-bottom: 12px; min-height: 38px;">${escapeHtml(p.descripcion || 'Sin descripción.')}</p>
+          <div style="font-size: 12px; color: var(--texto-secundario); margin-bottom: 12px;">
+            <div>Tema: <strong>${escapeHtml(p.tema || 'General')}</strong></div>
+            <div>Noticias cargadas: <strong>${newsCount}</strong></div>
+            <div>Última mod: <strong>${lastMod}</strong></div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--bordes); padding-top: 10px;">
+            <button class="btn btn-secondary btn-sm" onclick="openDashboard('${p.id}')">Ver Tablero →</button>
+            <div style="display: flex; gap: 4px;">
+              <button class="btn btn-secondary btn-sm" onclick="editProject('${p.id}')">Editar</button>
+              <button class="btn btn-danger btn-sm" onclick="confirmDeleteProject('${p.id}')">Eliminar</button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // VISTA TABLERO / DASHBOARD
+    function openDashboard(projectId) {
+      appState.currentProjectId = projectId;
+      showView('dashboard');
+    }
+
+    function renderDashboard() {
+      const proj = appState.proyectos.find(p => p.id === appState.currentProjectId);
+      if (!proj) { showView('projects'); return; }
+
+      // Cargar datos header
+      document.getElementById("dash-title").innerText = proj.nombre;
+      document.getElementById("dash-desc").innerText = proj.descripcion || "Sin descripción proporcionada.";
+      document.getElementById("dash-periodo").innerText = `${proj.fechaInicio || 'Indefinido'} a ${proj.fechaCierre || 'Indefinido'}`;
+      document.getElementById("dash-tema").innerText = proj.tema || "General";
+      document.getElementById("dash-estado").innerText = proj.estado;
+      document.getElementById("dash-estado").className = `badge ${proj.estado === 'Activo' ? 'badge-activa' : 'badge-cerrada'}`;
+
+      // Modo Presentación Header
+      document.getElementById("pres-title").innerText = proj.nombre;
+      document.getElementById("pres-desc").innerText = proj.descripcion;
+
+      // Filtrar noticias
+      let list = appState.noticias.filter(n => n.proyectoId === proj.id);
+
+      // Aplicar Búsqueda y Filtros
+      const search = document.getElementById("filter-search").value.toLowerCase();
+      const tipo = document.getElementById("filter-tipo").value;
+      const alcance = document.getElementById("filter-alcance").value;
+      const sort = document.getElementById("sort-order").value;
+
+      if (search) {
+        list = list.filter(n => 
+          (n.titular && n.titular.toLowerCase().includes(search)) ||
+          (n.medio && n.medio.toLowerCase().includes(search)) ||
+          (n.resumen && n.resumen.toLowerCase().includes(search)) ||
+          (n.etiquetas && n.etiquetas.toLowerCase().includes(search))
+        );
+      }
+      if (tipo) list = list.filter(n => n.tipoMedio === tipo);
+      if (alcance) list = list.filter(n => n.alcance === alcance);
+
+      // Ordenar por fecha de publicación
+      list.sort((a, b) => {
+        const da = new Date(a.fechaPublicacion || 0);
+        const db = new Date(b.fechaPublicacion || 0);
+        return sort === 'asc' ? da - db : db - da;
+      });
+
+      // Calcular Indicadores / KPIs Reales
+      const allProjNews = appState.noticias.filter(n => n.proyectoId === proj.id);
+      document.getElementById("kpi-total").innerText = allProjNews.length;
+      
+      const mediosUnicos = new Set(allProjNews.map(n => (n.medio || '').trim().toLowerCase())).size;
+      document.getElementById("kpi-medios").innerText = mediosUnicos;
+
+      const digitalCount = allProjNews.filter(n => n.tipoMedio === 'Digital').length;
+      document.getElementById("kpi-digital").innerText = digitalCount;
+
+      const provincialCount = allProjNews.filter(n => n.alcance === 'Provincial').length;
+      document.getElementById("kpi-provincial").innerText = provincialCount;
+
+      // Renderizar Distribuciones Visuales
+      renderDistribuicones(allProjNews);
+
+      // Renderizar Tarjetas de Noticias
+      const newsContainer = document.getElementById("news-list");
+      newsContainer.innerHTML = "";
+
+      if (list.length === 0) {
+        newsContainer.innerHTML = `
+          <div class="card" style="text-align: center; padding: 30px; color: var(--texto-secundario);">
+            No se encontraron noticias registradas para este proyecto o con los filtros aplicados.
+          </div>
+        `;
+        return;
+      }
+
+      list.forEach(n => {
+        const item = document.createElement("div");
+        item.className = "card";
+        item.style.borderLeft = "4px solid var(--azul-principal)";
+
+        const tagsHtml = (n.etiquetas || '').split(',')
+          .filter(t => t.trim())
+          .map(t => `<span class="badge" style="margin-right: 4px;">#${escapeHtml(t.trim())}</span>`)
+          .join('');
+
+        item.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px;">
+            <h4 style="font-size: 16px; color: var(--azul-principal); flex: 1;">${escapeHtml(n.titular)}</h4>
+            <div style="display: flex; gap: 4px;" class="no-print">
+              <button class="btn btn-secondary btn-sm" onclick="editNews('${n.id}')">Editar</button>
+              <button class="btn btn-secondary btn-sm" onclick="duplicateNews('${n.id}')">Duplicar</button>
+              <button class="btn btn-danger btn-sm" onclick="confirmDeleteNews('${n.id}')">Eliminar</button>
+            </div>
+          </div>
+          <div style="font-size: 12px; color: var(--texto-secundario); margin-bottom: 8px;">
+            <strong>${escapeHtml(n.medio)}</strong> &bull; ${n.fechaPublicacion || 'Sin fecha'} &bull; 
+            <span class="badge">${n.tipoMedio}</span> &bull; 
+            <span class="badge">${n.alcance}</span>
+          </div>
+          <p style="margin-bottom: 10px; font-size: 13.5px; line-height: 1.4;">${escapeHtml(n.resumen || 'Sin resumen.')}</p>
+          ${tagsHtml ? `<div style="margin-bottom: 8px;">${tagsHtml}</div>` : ''}
+          ${n.observaciones ? `<div style="font-size: 12px; font-style: italic; color: #555; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px;">Obs: ${escapeHtml(n.observaciones)}</div>` : ''}
+          <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--texto-secundario); border-top: 1px dashed var(--bordes); padding-top: 8px;">
+            <div>Cargado el: ${n.fechaCarga || 'N/A'}</div>
+            <div>
+              <button class="btn btn-secondary btn-sm no-print" onclick="copyLink('${escapeHtml(n.url)}')">📋 Copiar Enlace</button>
+              <a href="${escapeHtml(n.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Abrir Nota Original ↗</a>
+            </div>
+          </div>
+        `;
+        newsContainer.appendChild(item);
+      });
+    }
+
+    function renderDistribuicones(newsList) {
+      // Tipos
+      const tipos = {};
+      newsList.forEach(n => { tipos[n.tipoMedio] = (tipos[n.tipoMedio] || 0) + 1; });
+      const total = newsList.length || 1;
+
+      let htmlTipos = "";
+      for (const [k, v] of Object.entries(tipos)) {
+        const pct = Math.round((v / total) * 100);
+        htmlTipos += `
+          <div style="margin-bottom: 6px; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between;"><span>${k}</span><span>${v} (${pct}%)</span></div>
+            <div style="background: #EAEFF4; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 2px;">
+              <div style="background: var(--azul-principal); width: ${pct}%; height: 100%;"></div>
+            </div>
+          </div>
+        `;
+      }
+      document.getElementById("dist-tipo-container").innerHTML = htmlTipos || "<p style='color:var(--texto-secundario); font-size:12px;'>Sin datos.</p>";
+
+      // Medios
+      const medios = {};
+      newsList.forEach(n => {
+        const m = (n.medio || 'Otros').trim();
+        medios[m] = (medios[m] || 0) + 1;
+      });
+      const topMedios = Object.entries(medios).sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+      let htmlMedios = "";
+      topMedios.forEach(([k, v]) => {
+        const pct = Math.round((v / total) * 100);
+        htmlMedios += `
+          <div style="margin-bottom: 6px; font-size: 12px;">
+            <div style="display: flex; justify-content: space-between;"><span>${escapeHtml(k)}</span><span>${v} (${pct}%)</span></div>
+            <div style="background: #EAEFF4; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 2px;">
+              <div style="background: var(--enlace); width: ${pct}%; height: 100%;"></div>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById("dist-medio-container").innerHTML = htmlMedios || "<p style='color:var(--texto-secundario); font-size:12px;'>Sin datos.</p>";
+    }
+
+    // MODAL PROYECTO
+    function openProjectModal(project = null) {
+      document.getElementById("form-project").reset();
+      if (project) {
+        document.getElementById("modal-project-title").innerText = "Editar Proyecto";
+        document.getElementById("proj-id").value = project.id;
+        document.getElementById("proj-nombre").value = project.nombre || "";
+        document.getElementById("proj-descripcion").value = project.descripcion || "";
+        document.getElementById("proj-tema").value = project.tema || "";
+        document.getElementById("proj-estado").value = project.estado || "Activo";
+        document.getElementById("proj-fechaInicio").value = project.fechaInicio || "";
+        document.getElementById("proj-fechaCierre").value = project.fechaCierre || "";
+        document.getElementById("proj-responsable").value = project.responsable || "";
+      } else {
+        document.getElementById("modal-project-title").innerText = "Nuevo Proyecto";
+        document.getElementById("proj-id").value = "";
+      }
+      document.getElementById("modal-project").style.display = "flex";
+    }
+
+    function editProject(id) {
+      const proj = appState.proyectos.find(p => p.id === id);
+      if (proj) openProjectModal(proj);
+    }
+
+    function editCurrentProject() {
+      editProject(appState.currentProjectId);
+    }
+
+    async function handleSaveProject(e) {
+      e.preventDefault();
+      const payload = {
+        id: document.getElementById("proj-id").value,
+        nombre: document.getElementById("proj-nombre").value,
+        descripcion: document.getElementById("proj-descripcion").value,
+        tema: document.getElementById("proj-tema").value,
+        estado: document.getElementById("proj-estado").value,
+        fechaInicio: document.getElementById("proj-fechaInicio").value,
+        fechaCierre: document.getElementById("proj-fechaCierre").value,
+        responsable: document.getElementById("proj-responsable").value
+      };
+
+      closeModal("modal-project");
+      const res = await apiPost("saveProject", payload);
+      if (res) showNotification("Proyecto guardado correctamente.", "success");
+    }
+
+    function confirmDeleteProject(id) {
+      if (confirm("¿Está seguro de eliminar este proyecto y TODAS las noticias asociadas? Esta acción no se puede deshacer.")) {
+        apiPost("deleteProject", { id }).then(res => {
+          if (res) {
+            showNotification("Proyecto eliminado.", "success");
+            if (appState.currentProjectId === id) showView('projects');
+          }
+        });
+      }
+    }
+
+    // MODAL NOTICIA
+    function openNewsModal(news = null) {
+      document.getElementById("form-news").reset();
+      document.getElementById("duplicate-warning").style.display = "none";
+      document.getElementById("news-proyectoId").value = appState.currentProjectId;
+
+      if (news) {
+        document.getElementById("modal-news-title").innerText = "Editar Noticia";
+        document.getElementById("news-id").value = news.id;
+        document.getElementById("news-url").value = news.url || "";
+        document.getElementById("news-titular").value = news.titular || "";
+        document.getElementById("news-medio").value = news.medio || "";
+        document.getElementById("news-fechaPublicacion").value = news.fechaPublicacion || "";
+        document.getElementById("news-tipoMedio").value = news.tipoMedio || "Digital";
+        document.getElementById("news-alcance").value = news.alcance || "Provincial";
+        document.getElementById("news-resumen").value = news.resumen || "";
+        document.getElementById("news-etiquetas").value = news.etiquetas || "";
+        document.getElementById("news-observaciones").value = news.observaciones || "";
+      } else {
+        document.getElementById("modal-news-title").innerText = "Cargar Noticia";
+        document.getElementById("news-id").value = "";
+        document.getElementById("news-fechaPublicacion").value = new Date().toISOString().split('T')[0];
+      }
+      document.getElementById("modal-news").style.display = "flex";
+    }
+
+    function editNews(id) {
+      const n = appState.noticias.find(item => item.id === id);
+      if (n) openNewsModal(n);
+    }
+
+    function duplicateNews(id) {
+      const n = appState.noticias.find(item => item.id === id);
+      if (n) {
+        openNewsModal(n);
+        document.getElementById("news-id").value = ""; // Limpiar ID para guardar como nueva
+        document.getElementById("modal-news-title").innerText = "Duplicar Noticia";
+      }
+    }
+
+    function checkDuplicateUrl(url) {
+      if (!url) return;
+      const currentNewsId = document.getElementById("news-id").value;
+      const projId = appState.currentProjectId;
+      
+      const isDup = appState.noticias.some(n => 
+        n.proyectoId === projId && 
+        n.url.trim().toLowerCase() === url.trim().toLowerCase() && 
+        n.id !== currentNewsId
+      );
+
+      document.getElementById("duplicate-warning").style.display = isDup ? "block" : "none";
+    }
+
+    async function handleSaveNews(e) {
+      e.preventDefault();
+      const payload = {
+        id: document.getElementById("news-id").value,
+        proyectoId: document.getElementById("news-proyectoId").value,
+        url: document.getElementById("news-url").value,
+        titular: document.getElementById("news-titular").value,
+        medio: document.getElementById("news-medio").value,
+        fechaPublicacion: document.getElementById("news-fechaPublicacion").value,
+        tipoMedio: document.getElementById("news-tipoMedio").value,
+        alcance: document.getElementById("news-alcance").value,
+        resumen: document.getElementById("news-resumen").value,
+        etiquetas: document.getElementById("news-etiquetas").value,
+        observaciones: document.getElementById("news-observaciones").value
+      };
+
+      closeModal("modal-news");
+      const res = await apiPost("saveNews", payload);
+      if (res) showNotification("Noticia guardada correctamente.", "success");
+    }
+
+    function confirmDeleteNews(id) {
+      if (confirm("¿Está seguro de eliminar esta noticia?")) {
+        apiPost("deleteNews", { id }).then(res => {
+          if (res) showNotification("Noticia eliminada.", "success");
+        });
+      }
+    }
+
+    // MODOS Y UTILIDADES
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = "none";
+    }
+
+    function enterPresentationMode() {
+      document.body.classList.add("presentation-mode");
+      document.getElementById("presentation-header").style.display = "block";
+    }
+
+    function exitPresentationMode() {
+      document.body.classList.remove("presentation-mode");
+      document.getElementById("presentation-header").style.display = "none";
+    }
+
+    function copyLink(url) {
+      navigator.clipboard.writeText(url).then(() => {
+        showNotification("Enlace copiado al portapapeles.", "success");
+      });
+    }
+
+    function exportCSV() {
+      const proj = appState.proyectos.find(p => p.id === appState.currentProjectId);
+      const list = appState.noticias.filter(n => n.proyectoId === appState.currentProjectId);
+
+      if (list.length === 0) {
+        showNotification("No hay datos para exportar.", "warning");
+        return;
+      }
+
+      let csv = "Titular;Medio;Fecha Publicacion;Tipo Medio;Alcance;Resumen;URL;Etiquetas;Observaciones\n";
+      list.forEach(n => {
+        csv += `"${(n.titular||'').replace(/"/g, '""')}";"${(n.medio||'').replace(/"/g, '""')}";"${n.fechaPublicacion||''}";"${n.tipoMedio||''}";"${n.alcance||''}";"${(n.resumen||'').replace(/"/g, '""')}";"${n.url||''}";"${(n.etiquetas||'').replace(/"/g, '""')}";"${(n.observaciones||'').replace(/"/g, '""')}"\n`;
+      });
+
+      const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `Clipping_${(proj ? proj.nombre : 'MPBA').replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+    }
+
+    function showNotification(msg, type = "success") {
+      const container = document.getElementById("alert-container");
+      const alert = document.createElement("div");
+      alert.className = `alert alert-${type}`;
+      alert.innerText = msg;
+      container.appendChild(alert);
+      setTimeout(() => alert.remove(), 4000);
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
