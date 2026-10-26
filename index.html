@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CLIPPING | MPBA - Monitoreo de Prensa</title>
-  <!-- Favicon obligatorio según guía MPBA -->
+  <!-- Favicon obligatorio según guía MPBA[cite: 1] -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔷</text></svg>">
   
   <style>
-    /* Estilos basados en la Guía de Estilo Web Interna - MPBA */
+    /* Estilos basados en la Guía de Estilo Web Interna - MPBA[cite: 1, 2] */
     :root {
       --azul-principal: #193B57;
       --texto-principal: #243645;
@@ -34,7 +34,6 @@
       min-height: 100vh;
     }
 
-    /* Layout principal */
     .container {
       max-width: 1120px;
       width: 100%;
@@ -58,7 +57,6 @@
 
     main { flex: 1; padding: 24px 0; }
 
-    /* Componentes MPBA */
     .btn {
       display: inline-flex;
       align-items: center;
@@ -117,7 +115,6 @@
     .badge-activa { background: #E2F3EB; color: var(--exito); }
     .badge-cerrada { background: #FDE8E8; color: var(--error); }
 
-    /* Modales */
     .modal-backdrop {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0;
       background: rgba(15, 23, 42, 0.5);
@@ -135,7 +132,6 @@
     .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--bordes); padding-bottom: 12px; }
     .modal-title { font-size: 18px; font-weight: 600; color: var(--azul-principal); }
 
-    /* Alertas */
     .alert {
       padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; display: flex; align-items: center; gap: 8px;
     }
@@ -143,7 +139,6 @@
     .alert-danger { background: #FDE8E8; color: var(--error); border: 1px solid #F5C2C2; }
     .alert-warning { background: #FFF8E6; color: #8A6D3B; border: 1px solid #FAEBCC; }
 
-    /* Tablero Dashboards */
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .kpi-card { background: var(--blanco); border: 1px solid var(--bordes); border-radius: 10px; padding: 14px; text-align: center; }
     .kpi-value { font-size: 24px; font-weight: 700; color: var(--azul-principal); }
@@ -152,10 +147,8 @@
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 768px) { .grid-2, .form-row { flex-direction: column; grid-template-columns: 1fr; } }
 
-    /* Barra de estado y guardado */
     .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; background: #EAEFF4; padding: 8px 14px; border-radius: 8px; font-size: 12px; color: var(--texto-secundario); }
 
-    /* Modo Presentación */
     body.presentation-mode header, body.presentation-mode .no-print, body.presentation-mode footer { display: none !important; }
     body.presentation-mode { background: #0F172A; color: #F8FAFC; }
     body.presentation-mode .card { background: #1E293B; border-color: #334155; color: #F8FAFC; }
@@ -165,7 +158,6 @@
     body.presentation-mode h2, body.presentation-mode h3, body.presentation-mode h4 { color: #F8FAFC !important; }
     body.presentation-mode a { color: #38BDF8; }
 
-    /* Vista de impresión */
     @media print {
       .no-print { display: none !important; }
       body { background: white; color: black; }
@@ -185,13 +177,11 @@
   </header>
 
   <main class="container">
-    <!-- Barra de Estado / Sync -->
     <div class="status-bar no-print">
       <div>Estado: <strong id="sync-status" style="color: var(--exito);">Conectado</strong></div>
       <div>Última actualización: <span id="last-update">Sincronizando...</span></div>
     </div>
 
-    <!-- Mensajes de Notificación -->
     <div id="alert-container" class="no-print"></div>
 
     <!-- VISTA 1: PROYECTOS (INICIO) -->
@@ -205,13 +195,12 @@
       </div>
 
       <div id="projects-list" class="grid-2">
-        <!-- Render dinámico de proyectos -->
+        <!-- Render dinámico -->
       </div>
     </section>
 
-    <!-- VISTA 2: TABLERO DE PROYECTO (DETALLE) -->
+    <!-- VISTA 2: TABLERO DE PROYECTO -->
     <section id="view-dashboard" style="display: none;">
-      <!-- Cabecera de Proyecto -->
       <div class="card no-print">
         <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 12px;">
           <div>
@@ -219,7 +208,6 @@
             <h2 id="dash-title" style="font-size: 22px; color: var(--azul-principal);"></h2>
             <p id="dash-desc" style="color: var(--texto-secundario); margin-top: 4px;"></p>
             <div style="display: flex; gap: 12px; margin-top: 8px; font-size: 12px; color: var(--texto-secundario);">
-              <span>Período: <strong id="dash-periodo"></strong></span> |
               <span>Tema: <strong id="dash-tema"></strong></span> |
               <span>Estado: <span id="dash-estado" class="badge"></span></span>
             </div>
@@ -234,7 +222,6 @@
         </div>
       </div>
 
-      <!-- Encabezado exclusivo de Presentación -->
       <div id="presentation-header" style="display: none; margin-bottom: 20px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <div>
@@ -245,7 +232,6 @@
         </div>
       </div>
 
-      <!-- KPIs / Indicadores Reales -->
       <div class="kpi-grid">
         <div class="kpi-card">
           <div class="kpi-value" id="kpi-total">0</div>
@@ -265,10 +251,9 @@
         </div>
       </div>
 
-      <!-- Filtros y Búsqueda -->
       <div class="card no-print" style="padding: 12px;">
         <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center;">
-          <input type="text" id="filter-search" class="form-control" style="flex: 2; min-width: 200px;" placeholder="Buscar titular, medio, resumen o etiqueta..." oninput="renderDashboard()">
+          <input type="text" id="filter-search" class="form-control" style="flex: 2; min-width: 200px;" placeholder="Buscar titular, medio, cobertura o etiqueta..." oninput="renderDashboard()">
           <select id="filter-tipo" class="form-control" style="flex: 1; min-width: 140px;" onchange="renderDashboard()">
             <option value="">Todos los Tipos</option>
             <option value="Digital">Digital</option>
@@ -291,7 +276,6 @@
         </div>
       </div>
 
-      <!-- Distribución Visual de Medios y Tipos -->
       <div class="grid-2" style="margin-bottom: 20px;">
         <div class="card">
           <h4 style="font-size: 14px; color: var(--azul-principal); margin-bottom: 10px;">Distribución por Tipo de Medio</h4>
@@ -303,15 +287,14 @@
         </div>
       </div>
 
-      <!-- Listado de Noticias (Cronología) -->
       <h3 style="font-size: 16px; color: var(--azul-principal); margin-bottom: 12px;">Cronología de Cobertura</h3>
       <div id="news-list">
-        <!-- Render dinámico de noticias -->
+        <!-- Render dinámico -->
       </div>
     </section>
   </main>
 
-  <!-- MODAL: CREAR / EDITAR PROYECTO -->
+  <!-- MODAL: PROYECTO -->
   <div id="modal-project" class="modal-backdrop" style="display: none;">
     <div class="modal">
       <div class="modal-header">
@@ -326,7 +309,7 @@
         </div>
         <div class="form-group">
           <label for="proj-descripcion">Descripción / Objetivos</label>
-          <textarea id="proj-descripcion" class="form-control" rows="2" placeholder="Resumen institucional de la campaña de prensa..."></textarea>
+          <textarea id="proj-descripcion" class="form-control" rows="2" placeholder="Resumen institucional de la campaña..."></textarea>
         </div>
         <div class="form-row">
           <div class="form-group">
@@ -341,16 +324,6 @@
             </select>
           </div>
         </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label for="proj-fechaInicio">Fecha Inicio</label>
-            <input type="date" id="proj-fechaInicio" class="form-control">
-          </div>
-          <div class="form-group">
-            <label for="proj-fechaCierre">Fecha Cierre</label>
-            <input type="date" id="proj-fechaCierre" class="form-control">
-          </div>
-        </div>
         <div class="form-group">
           <label for="proj-responsable">Responsable / Área (Opcional)</label>
           <input type="text" id="proj-responsable" class="form-control" placeholder="Ej: Prensa / Equipo Digital">
@@ -363,7 +336,7 @@
     </div>
   </div>
 
-  <!-- MODAL: CREAR / EDITAR NOTICIA -->
+  <!-- MODAL: NOTICIA -->
   <div id="modal-news" class="modal-backdrop" style="display: none;">
     <div class="modal">
       <div class="modal-header">
@@ -424,13 +397,13 @@
         </div>
 
         <div class="form-group">
-          <label for="news-etiquetas">Etiquetas (separadas por coma)</label>
-          <input type="text" id="news-etiquetas" class="form-control" placeholder="Ej: Fiscalías, Phishing, Prevención">
+          <label for="news-observaciones">Análisis de Cobertura / Observaciones</label>
+          <input type="text" id="news-observaciones" class="form-control" placeholder="Ej: Tapa de diario, repercusión positiva, cita al Procurador">
         </div>
 
         <div class="form-group">
-          <label for="news-observaciones">Observaciones Internas</label>
-          <input type="text" id="news-observaciones" class="form-control" placeholder="Ej: Repercusión positiva, cita al Procurador General">
+          <label for="news-etiquetas">Etiquetas (separadas por coma)</label>
+          <input type="text" id="news-etiquetas" class="form-control" placeholder="Ej: Fiscalías, Phishing, Prevención">
         </div>
 
         <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px;">
@@ -448,11 +421,9 @@
   </footer>
 
   <script>
-    // Configuración del endpoint de Apps Script
-    // REEMPLAZAR CON TU URL DE DESPLEGUE DE GOOGLE APPS SCRIPT
+    // Configuración del endpoint de Apps Script (Reemplazar con tu URL real)
     const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxN5B9Ee6tgsFpnZeA-qsG2sk-DjgEzfusAHh1GrWSD2Brt26B6gQcBHtLTICZ54NjX/exec";
 
-    // Estado global de la aplicación
     let appState = {
       proyectos: [],
       noticias: [],
@@ -460,11 +431,8 @@
       lastUpdate: null
     };
 
-    // Inicialización
     document.addEventListener("DOMContentLoaded", () => {
       fetchData();
-      
-      // Control de atajo de teclado para salir de Presentación
       document.addEventListener("keydown", (e) => {
         if (e.key === "Escape" && document.body.classList.contains("presentation-mode")) {
           exitPresentationMode();
@@ -472,7 +440,6 @@
       });
     });
 
-    // Comunicación con el Backend
     async function fetchData() {
       updateSyncStatus("Sincronizando...", "#155C8C");
       try {
@@ -489,11 +456,11 @@
           updateSyncStatus("Conectado", "var(--exito)");
           renderCurrentView();
         } else {
-          showNotification("Error al cargar datos del servidor: " + json.error, "danger");
+          showNotification("Error al cargar datos: " + json.error, "danger");
           updateSyncStatus("Error de conexión", "var(--error)");
         }
       } catch (err) {
-        showNotification("No se pudo conectar con el servidor. Verifique la URL de Apps Script.", "danger");
+        showNotification("No se pudo conectar con el servidor Apps Script.", "danger");
         updateSyncStatus("Desconectado", "var(--error)");
       }
     }
@@ -511,12 +478,12 @@
           await fetchData();
           return json.data;
         } else {
-          showNotification("Error en la operación: " + json.error, "danger");
+          showNotification("Error: " + json.error, "danger");
           updateSyncStatus("Error", "var(--error)");
           return null;
         }
       } catch (err) {
-        showNotification("Error de red al guardar los cambios.", "danger");
+        showNotification("Error de red al guardar.", "danger");
         updateSyncStatus("Error de red", "var(--error)");
         return null;
       }
@@ -528,7 +495,6 @@
       el.style.color = color;
     }
 
-    // Renderizado de Vistas
     function renderCurrentView() {
       if (appState.currentProjectId) {
         renderDashboard();
@@ -550,7 +516,6 @@
       }
     }
 
-    // VISTA PROYECTOS
     function renderProjectsList() {
       const container = document.getElementById("projects-list");
       container.innerHTML = "";
@@ -595,7 +560,6 @@
       });
     }
 
-    // VISTA TABLERO / DASHBOARD
     function openDashboard(projectId) {
       appState.currentProjectId = projectId;
       showView('dashboard');
@@ -605,22 +569,17 @@
       const proj = appState.proyectos.find(p => p.id === appState.currentProjectId);
       if (!proj) { showView('projects'); return; }
 
-      // Cargar datos header
       document.getElementById("dash-title").innerText = proj.nombre;
-      document.getElementById("dash-desc").innerText = proj.descripcion || "Sin descripción proporcionada.";
-      document.getElementById("dash-periodo").innerText = `${proj.fechaInicio || 'Indefinido'} a ${proj.fechaCierre || 'Indefinido'}`;
+      document.getElementById("dash-desc").innerText = proj.descripcion || "Sin descripción.";
       document.getElementById("dash-tema").innerText = proj.tema || "General";
       document.getElementById("dash-estado").innerText = proj.estado;
       document.getElementById("dash-estado").className = `badge ${proj.estado === 'Activo' ? 'badge-activa' : 'badge-cerrada'}`;
 
-      // Modo Presentación Header
       document.getElementById("pres-title").innerText = proj.nombre;
       document.getElementById("pres-desc").innerText = proj.descripcion;
 
-      // Filtrar noticias
       let list = appState.noticias.filter(n => n.proyectoId === proj.id);
 
-      // Aplicar Búsqueda y Filtros
       const search = document.getElementById("filter-search").value.toLowerCase();
       const tipo = document.getElementById("filter-tipo").value;
       const alcance = document.getElementById("filter-alcance").value;
@@ -631,20 +590,19 @@
           (n.titular && n.titular.toLowerCase().includes(search)) ||
           (n.medio && n.medio.toLowerCase().includes(search)) ||
           (n.resumen && n.resumen.toLowerCase().includes(search)) ||
+          (n.observaciones && n.observaciones.toLowerCase().includes(search)) ||
           (n.etiquetas && n.etiquetas.toLowerCase().includes(search))
         );
       }
       if (tipo) list = list.filter(n => n.tipoMedio === tipo);
       if (alcance) list = list.filter(n => n.alcance === alcance);
 
-      // Ordenar por fecha de publicación
       list.sort((a, b) => {
         const da = new Date(a.fechaPublicacion || 0);
         const db = new Date(b.fechaPublicacion || 0);
         return sort === 'asc' ? da - db : db - da;
       });
 
-      // Calcular Indicadores / KPIs Reales
       const allProjNews = appState.noticias.filter(n => n.proyectoId === proj.id);
       document.getElementById("kpi-total").innerText = allProjNews.length;
       
@@ -657,17 +615,15 @@
       const provincialCount = allProjNews.filter(n => n.alcance === 'Provincial').length;
       document.getElementById("kpi-provincial").innerText = provincialCount;
 
-      // Renderizar Distribuciones Visuales
       renderDistribuicones(allProjNews);
 
-      // Renderizar Tarjetas de Noticias
       const newsContainer = document.getElementById("news-list");
       newsContainer.innerHTML = "";
 
       if (list.length === 0) {
         newsContainer.innerHTML = `
           <div class="card" style="text-align: center; padding: 30px; color: var(--texto-secundario);">
-            No se encontraron noticias registradas para este proyecto o con los filtros aplicados.
+            No hay noticias registradas con los filtros seleccionados.
           </div>
         `;
         return;
@@ -697,12 +653,16 @@
             <span class="badge">${n.tipoMedio}</span> &bull; 
             <span class="badge">${n.alcance}</span>
           </div>
-          <p style="margin-bottom: 10px; font-size: 13.5px; line-height: 1.4;">${escapeHtml(n.resumen || 'Sin resumen.')}</p>
+          ${n.resumen ? `<p style="margin-bottom: 10px; font-size: 13.5px; line-height: 1.4;">${escapeHtml(n.resumen)}</p>` : ''}
+          ${n.observaciones ? `
+            <div style="background-color: #F0F4F8; border-left: 3px solid #193B57; padding: 8px 12px; border-radius: 4px; font-size: 13px; color: #1E293B; margin-bottom: 10px;">
+              <strong>Análisis de Cobertura:</strong> ${escapeHtml(n.observaciones)}
+            </div>
+          ` : ''}
           ${tagsHtml ? `<div style="margin-bottom: 8px;">${tagsHtml}</div>` : ''}
-          ${n.observaciones ? `<div style="font-size: 12px; font-style: italic; color: #555; background: #F8FAFC; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px;">Obs: ${escapeHtml(n.observaciones)}</div>` : ''}
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--texto-secundario); border-top: 1px dashed var(--bordes); padding-top: 8px;">
-            <div>Cargado el: ${n.fechaCarga || 'N/A'}</div>
-            <div>
+            <div>Cargado: ${n.fechaCarga || 'N/A'}</div>
+            <div style="display: flex; gap: 8px;">
               <button class="btn btn-secondary btn-sm no-print" onclick="copyLink('${escapeHtml(n.url)}')">📋 Copiar Enlace</button>
               <a href="${escapeHtml(n.url)}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm">Abrir Nota Original ↗</a>
             </div>
@@ -713,7 +673,6 @@
     }
 
     function renderDistribuicones(newsList) {
-      // Tipos
       const tipos = {};
       newsList.forEach(n => { tipos[n.tipoMedio] = (tipos[n.tipoMedio] || 0) + 1; });
       const total = newsList.length || 1;
@@ -732,7 +691,6 @@
       }
       document.getElementById("dist-tipo-container").innerHTML = htmlTipos || "<p style='color:var(--texto-secundario); font-size:12px;'>Sin datos.</p>";
 
-      // Medios
       const medios = {};
       newsList.forEach(n => {
         const m = (n.medio || 'Otros').trim();
@@ -755,7 +713,6 @@
       document.getElementById("dist-medio-container").innerHTML = htmlMedios || "<p style='color:var(--texto-secundario); font-size:12px;'>Sin datos.</p>";
     }
 
-    // MODAL PROYECTO
     function openProjectModal(project = null) {
       document.getElementById("form-project").reset();
       if (project) {
@@ -765,8 +722,6 @@
         document.getElementById("proj-descripcion").value = project.descripcion || "";
         document.getElementById("proj-tema").value = project.tema || "";
         document.getElementById("proj-estado").value = project.estado || "Activo";
-        document.getElementById("proj-fechaInicio").value = project.fechaInicio || "";
-        document.getElementById("proj-fechaCierre").value = project.fechaCierre || "";
         document.getElementById("proj-responsable").value = project.responsable || "";
       } else {
         document.getElementById("modal-project-title").innerText = "Nuevo Proyecto";
@@ -792,8 +747,6 @@
         descripcion: document.getElementById("proj-descripcion").value,
         tema: document.getElementById("proj-tema").value,
         estado: document.getElementById("proj-estado").value,
-        fechaInicio: document.getElementById("proj-fechaInicio").value,
-        fechaCierre: document.getElementById("proj-fechaCierre").value,
         responsable: document.getElementById("proj-responsable").value
       };
 
@@ -803,7 +756,7 @@
     }
 
     function confirmDeleteProject(id) {
-      if (confirm("¿Está seguro de eliminar este proyecto y TODAS las noticias asociadas? Esta acción no se puede deshacer.")) {
+      if (confirm("¿Está seguro de eliminar este proyecto y TODAS las noticias asociadas?")) {
         apiPost("deleteProject", { id }).then(res => {
           if (res) {
             showNotification("Proyecto eliminado.", "success");
@@ -813,7 +766,6 @@
       }
     }
 
-    // MODAL NOTICIA
     function openNewsModal(news = null) {
       document.getElementById("form-news").reset();
       document.getElementById("duplicate-warning").style.display = "none";
@@ -848,7 +800,7 @@
       const n = appState.noticias.find(item => item.id === id);
       if (n) {
         openNewsModal(n);
-        document.getElementById("news-id").value = ""; // Limpiar ID para guardar como nueva
+        document.getElementById("news-id").value = "";
         document.getElementById("modal-news-title").innerText = "Duplicar Noticia";
       }
     }
@@ -896,7 +848,6 @@
       }
     }
 
-    // MODOS Y UTILIDADES
     function closeModal(modalId) {
       document.getElementById(modalId).style.display = "none";
     }
@@ -926,9 +877,9 @@
         return;
       }
 
-      let csv = "Titular;Medio;Fecha Publicacion;Tipo Medio;Alcance;Resumen;URL;Etiquetas;Observaciones\n";
+      let csv = "Titular;Medio;Fecha Publicacion;Tipo Medio;Alcance;Resumen;Analisis Cobertura;URL;Etiquetas\n";
       list.forEach(n => {
-        csv += `"${(n.titular||'').replace(/"/g, '""')}";"${(n.medio||'').replace(/"/g, '""')}";"${n.fechaPublicacion||''}";"${n.tipoMedio||''}";"${n.alcance||''}";"${(n.resumen||'').replace(/"/g, '""')}";"${n.url||''}";"${(n.etiquetas||'').replace(/"/g, '""')}";"${(n.observaciones||'').replace(/"/g, '""')}"\n`;
+        csv += `"${(n.titular||'').replace(/"/g, '""')}";"${(n.medio||'').replace(/"/g, '""')}";"${n.fechaPublicacion||''}";"${n.tipoMedio||''}";"${n.alcance||''}";"${(n.resumen||'').replace(/"/g, '""')}";"${(n.observaciones||'').replace(/"/g, '""')}";"${n.url||''}";"${(n.etiquetas||'').replace(/"/g, '""')}"\n`;
       });
 
       const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8;" });
